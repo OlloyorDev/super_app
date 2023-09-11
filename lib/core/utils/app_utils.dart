@@ -14,6 +14,7 @@ sealed class AppUtils {
   static const kGap12 = Gap(12);
   static const kGap15 = Gap(15);
   static const kGap16 = Gap(16);
+  static const kGap100 = Gap(100);
 
   /// divider
   static const kDivider = Divider(height: 1);
@@ -23,7 +24,10 @@ sealed class AppUtils {
   static const kPaddingAll1 = EdgeInsets.all(1);
   static const kPaddingAll4 = EdgeInsets.all(4);
   static const kPaddingAll5 = EdgeInsets.all(5);
+  static const kPaddingAll14 = EdgeInsets.all(14);
   static const kPaddingHorizontal16 = EdgeInsets.symmetric(horizontal: 16);
+  static const kPaddingHorizontal48 =
+      EdgeInsets.symmetric(horizontal: 48, vertical: 12);
 
   /// border radius
   static const kRadius = Radius.zero;
