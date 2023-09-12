@@ -9,38 +9,38 @@ part 'receipts_event.dart';
 part 'receipts_state.dart';
 
 class ReceiptsBloc extends Bloc<ReceiptsEvent, ReceiptsState> {
-  ReceiptsBloc({
-    required this.databaseHelper,
-  }) : super(const ReceiptsState()) {
+  ReceiptsBloc() : super(ReceiptsState()) {
     on<CameraEvent>(_onCameraEvent);
     on<OpenCameraEvent>(_openCameraEvent);
     on<SaveImageEvent>(_saveImageEvent);
     on<SaveMultiImageEvent>(_saveMultiImageEvent);
   }
 
-  final DatabaseHelper databaseHelper;
-
-  Future<void> _saveImageEvent(
+  void _saveImageEvent(
     SaveImageEvent event,
     Emitter<ReceiptsState> emit,
-  ) async {
+  ) {
     emit(state.copyWith(saveImageStatus: SaveImageStatus.saving));
-    await databaseHelper.insertImage(event.path);
-    emit(state.copyWith(saveImageStatus: SaveImageStatus.saved));
+    final List<String> images = [event.path];
+    emit(state.copyWith(
+      images: images,
+      saveImageStatus: SaveImageStatus.saved,
+    ));
   }
 
-  Future<void> _saveMultiImageEvent(
+  void _saveMultiImageEvent(
     SaveMultiImageEvent event,
     Emitter<ReceiptsState> emit,
-  ) async {
+  ) {
     emit(state.copyWith(
       isCamera: !state.isCamera,
       saveMultiImageStatus: SaveMultiImageStatus.saving,
     ));
-    for (final e in event.path) {
-      await databaseHelper.insertImage(e);
-    }
-    emit(state.copyWith(saveMultiImageStatus: SaveMultiImageStatus.saved));
+    final List<String> images = [...event.path];
+    emit(state.copyWith(
+      images: images,
+      saveMultiImageStatus: SaveMultiImageStatus.saved,
+    ));
   }
 
   void _onCameraEvent(

@@ -1,29 +1,35 @@
 part of 'receipts_bloc.dart';
 
-class   ReceiptsState extends Equatable {
-  const ReceiptsState({
+// ignore: must_be_immutable
+class ReceiptsState extends Equatable {
+  ReceiptsState({
     this.isCamera = false,
     this.cameraStatus = CameraStatus.loading,
     this.saveImageStatus = SaveImageStatus.intintial,
     this.saveMultiImageStatus = SaveMultiImageStatus.intintial,
+    this.images,
   });
 
   final bool isCamera;
   final CameraStatus cameraStatus;
   final SaveImageStatus saveImageStatus;
   final SaveMultiImageStatus saveMultiImageStatus;
+  List<String>? images = [];
 
   ReceiptsState copyWith({
     bool? isCamera,
     CameraStatus? cameraStatus,
     SaveImageStatus? saveImageStatus,
     SaveMultiImageStatus? saveMultiImageStatus,
+    List<String>? images,
   }) =>
       ReceiptsState(
         isCamera: isCamera ?? this.isCamera,
         cameraStatus: cameraStatus ?? this.cameraStatus,
         saveImageStatus: saveImageStatus ?? SaveImageStatus.intintial,
-        saveMultiImageStatus: saveMultiImageStatus ?? SaveMultiImageStatus.intintial,
+        saveMultiImageStatus:
+            saveMultiImageStatus ?? SaveMultiImageStatus.intintial,
+        images: images ?? this.images,
       );
 
   @override
@@ -32,6 +38,7 @@ class   ReceiptsState extends Equatable {
         cameraStatus,
         saveImageStatus,
         saveMultiImageStatus,
+        images,
       ];
 }
 

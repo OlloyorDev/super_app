@@ -74,8 +74,14 @@ class _ReceiptsScreenState extends State<ReceiptsScreen>
       BlocConsumer<ReceiptsBloc, ReceiptsState>(
         listener: (context, state) {
           state.saveImageStatus.isSaved || state.saveMultiImageStatus.isSaved
-              ? Navigator.pushNamed(context, Routes.uploadReceipt)
-              : print(state.cameraStatus);
+              ? Navigator.pushNamed(
+                  context,
+                  Routes.uploadReceipt,
+                  arguments: UploadReceiptArgs(imageList: state.images ?? []),
+                )
+              : debugPrint(state.cameraStatus.toString());
+          debugPrint('Olloyor');
+          debugPrint(state.images?.length.toString());
         },
         builder: (context, state) => Scaffold(
           backgroundColor: ThemeColors.light.black,
@@ -93,9 +99,11 @@ class _ReceiptsScreenState extends State<ReceiptsScreen>
                     state.saveMultiImageStatus == SaveMultiImageStatus.saving
                 ? Center(
                     child: CircularProgressIndicator.adaptive(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                    ThemeColors.light.white,
-                  )))
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        ThemeColors.light.white,
+                      ),
+                    ),
+                  )
                 : CameraPreview(
                     _controller,
                     child: Column(
@@ -146,11 +154,13 @@ class _ReceiptsScreenState extends State<ReceiptsScreen>
                                     InkWell(
                                       onTap: () async {
                                         await pickImage().then((value) {
-                                          context.read<ReceiptsBloc>().add(
-                                                SaveMultiImageEvent(
-                                                  path: value,
-                                                ),
-                                              );
+                                          if (value.isNotEmpty) {
+                                            context.read<ReceiptsBloc>().add(
+                                                  SaveMultiImageEvent(
+                                                    path: value,
+                                                  ),
+                                                );
+                                          }
                                         });
                                       },
                                       child: Ink(
@@ -180,11 +190,13 @@ class _ReceiptsScreenState extends State<ReceiptsScreen>
                                     InkWell(
                                       onTap: () async {
                                         await pickFile().then((value) {
-                                          context.read<ReceiptsBloc>().add(
-                                                SaveMultiImageEvent(
-                                                  path: value,
-                                                ),
-                                              );
+                                          if (value.isNotEmpty) {
+                                            context.read<ReceiptsBloc>().add(
+                                                  SaveMultiImageEvent(
+                                                    path: value,
+                                                  ),
+                                                );
+                                          }
                                         });
                                       },
                                       child: Ink(
@@ -264,4 +276,12 @@ class _ReceiptsScreenState extends State<ReceiptsScreen>
           ),
         ),
       );
+}
+
+class UploadReceiptArgs {
+  const UploadReceiptArgs({
+    required this.imageList,
+  });
+
+  final List<String> imageList;
 }

@@ -41,22 +41,23 @@ sealed class AppRoutes {
       case Routes.receipt:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => ReceiptsBloc(databaseHelper: sl()),
+            create: (_) => ReceiptsBloc(),
             child: const ReceiptsScreen(),
           ),
         );
       case Routes.allReceipt:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => AllReceiptsBloc(),
+            create: (_) => AllReceiptsBloc(databaseHelper: sl()),
             child: const AllReceiptsScreen(),
           ),
         );
       case Routes.uploadReceipt:
+        final UploadReceiptArgs args = settings.arguments! as UploadReceiptArgs;
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (_) => UploadReceiptsBloc(databaseHelper: sl()),
-            child: const UploadReceiptsScreen(),
+            child: UploadReceiptsScreen(args: args),
           ),
         );
       default:
