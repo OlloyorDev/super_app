@@ -1,5 +1,10 @@
 part of 'uploadreceipts_bloc.dart';
 
-abstract class UploadreceiptsEvent extends Equatable {
-  const UploadreceiptsEvent();
+abstract class UploadReceiptsEvent extends Equatable {
+  const UploadReceiptsEvent();
+}
+
+class InitDataBase extends UploadReceiptsEvent {
+  @override
+  List<Object?> get props => [];
 }

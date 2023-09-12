@@ -23,3 +23,25 @@ class OpenCameraEvent extends ReceiptsEvent {
   @override
   List<Object?> get props => [];
 }
+
+class SaveImageEvent extends ReceiptsEvent {
+  const SaveImageEvent({
+    required this.path,
+  });
+
+  final String path;
+
+  @override
+  List<Object?> get props => [path];
+}
+
+class SaveMultiImageEvent extends ReceiptsEvent {
+  const SaveMultiImageEvent({
+    required this.path,
+  });
+
+  final List<String> path;
+
+  @override
+  List<Object?> get props => [path];
+}

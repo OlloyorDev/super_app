@@ -1,12 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gap/gap.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:super_app/core/utils/app_utils.dart';
-import 'package:super_app/core/extention/app_extention.dart';
-import 'package:super_app/core/theme/app_colors.dart';
 import 'package:super_app/route/route_name.dart';
 import 'package:super_app/src/home/presentation/bloc/home_bloc.dart';
+import 'package:super_app/src/upload_receipts/news.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,9 +18,43 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late Database database;
+
+  Future<Database> _openDatabase() async {
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+    final String dbPath = join(appDocDir.path, 'image_database.db');
+    return openDatabase(dbPath, version: 1,
+        onCreate: (Database db, int version) async {
+      await db.execute('''
+      CREATE TABLE IF NOT EXISTS images (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        path TEXT
+      )
+      ''');
+    });
+  }
+
+  @override
+  void initState() {
+    initDatabase();
+    super.initState();
+  }
+
+  Future<void> initDatabase() async {
+    database = await _openDatabase();
+  }
+
   @override
   Widget build(BuildContext context) => BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) => Scaffold(
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const News()));
+            },
+          ),
           appBar: AppBar(
             automaticallyImplyLeading: false,
             title: const Text('Super App'),

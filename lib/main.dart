@@ -5,12 +5,14 @@ import 'package:super_app/core/log_bloc_observer.dart';
 import 'package:super_app/core/theme/app_theme.dart';
 import 'package:super_app/route/app_route.dart';
 import 'package:super_app/route/route_name.dart';
+import 'injector_container.dart' as di;
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kDebugMode) {
     Bloc.observer = LogBlocObserver();
   }
+  await di.init();
   runApp(const MyApp());
 }
 
