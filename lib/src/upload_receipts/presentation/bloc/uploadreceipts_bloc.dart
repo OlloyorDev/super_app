@@ -10,9 +10,12 @@ class UploadReceiptsBloc
     extends Bloc<UploadReceiptsEvent, UploadReceiptsState> {
   UploadReceiptsBloc({
     required this.databaseHelper,
-  }) : super(UploadReceiptsState()) {
+  }) : super(const UploadReceiptsState()) {
     on<InitDataBase>(_initDataBase);
+    on<DeleteIndexImage>(_deleteIndexImage);
   }
+
+  final DatabaseHelper databaseHelper;
 
   Future<void> _initDataBase(
     InitDataBase event,
@@ -25,5 +28,18 @@ class UploadReceiptsBloc
     ));
   }
 
-  final DatabaseHelper databaseHelper;
+  Future<void> _deleteIndexImage(
+    DeleteIndexImage event,
+    Emitter<UploadReceiptsState> emit,
+  ) async {
+    var imageList = state.imageList;
+    final int id = imageList?[event.index]['id'];
+    await databaseHelper.deleteImage(id);
+    imageList = await databaseHelper.getImages();
+    emit(
+      state.copyWith(
+        imageList: imageList,
+      ),
+    );
+  }
 }

@@ -37,7 +37,13 @@ class _UploadReceiptsScreenState extends State<UploadReceiptsScreen> {
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
-                    onPressed: () {},
+                    onPressed: () {
+                      context.read<UploadReceiptsBloc>().add(
+                            DeleteIndexImage(
+                              index: index,
+                            ),
+                          );
+                    },
                   ),
                 );
               },

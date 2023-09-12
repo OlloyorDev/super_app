@@ -1,19 +1,24 @@
 import 'package:file_picker/file_picker.dart';
 
 mixin FileMixin {
-  Future<List<String>> pickImage() async {
-    final List<String> filePath = [];
-    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+  Future<List<String>> pickFile() async {
+    final List<String> paths = [];
+
+    final FilePickerResult? result = await FilePicker.platform
+        .pickFiles(
       type: FileType.custom,
       allowedExtensions: ['png', 'jpg'],
       withData: true,
       withReadStream: true,
       lockParentWindow: true,
-      dialogTitle: 'Fayl tanlang',
       onFileLoading: print,
       allowMultiple: true,
-    );
-
-    return filePath;
+    )
+        .then((value) async {
+      for (final e in value?.files ?? []) {
+        paths.add(e.path ?? '');
+      }
+    });
+    return paths;
   }
 }

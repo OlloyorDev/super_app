@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   AppUtils.kGap6,
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, Routes.allReceipt);
+                      Navigator.pushNamed(context, Routes.uploadReceipt);
                     },
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,

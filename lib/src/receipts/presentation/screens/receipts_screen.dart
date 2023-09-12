@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_app/constants/svg/app_svg.dart';
+import 'package:super_app/core/mixins/file_mixin.dart';
 import 'package:super_app/core/mixins/image_mixin.dart';
 import 'package:super_app/core/theme/app_colors.dart';
 import 'package:super_app/core/theme/app_text_styles.dart';
@@ -19,7 +23,7 @@ class ReceiptsScreen extends StatefulWidget {
 }
 
 class _ReceiptsScreenState extends State<ReceiptsScreen>
-    with ReceiptsMixin, ImageMixin {
+    with ReceiptsMixin, ImageMixin, FileMixin {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
 
@@ -85,8 +89,13 @@ class _ReceiptsScreenState extends State<ReceiptsScreen>
                     );
               }
             },
-            child: state.cameraStatus == CameraStatus.loading || state.saveMultiImageStatus == SaveMultiImageStatus.saving
-                ?  Center(child: CircularProgressIndicator.adaptive(valueColor: AlwaysStoppedAnimation<Color>(ThemeColors.light.white,)))
+            child: state.cameraStatus == CameraStatus.loading ||
+                    state.saveMultiImageStatus == SaveMultiImageStatus.saving
+                ? Center(
+                    child: CircularProgressIndicator.adaptive(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                    ThemeColors.light.white,
+                  )))
                 : CameraPreview(
                     _controller,
                     child: Column(
@@ -170,20 +179,13 @@ class _ReceiptsScreenState extends State<ReceiptsScreen>
                                     AppUtils.kDivider,
                                     InkWell(
                                       onTap: () async {
-                                        // final FilePickerResult? result =
-                                        //     await FilePicker.platform.pickFiles(
-                                        //         type: FileType.custom,
-                                        //         allowedExtensions: [
-                                        //           'png',
-                                        //           'jpg'
-                                        //         ],
-                                        //         withData: true,
-                                        //         withReadStream: true,
-                                        //         lockParentWindow: true,
-                                        //         dialogTitle: 'Fayl tanlang',
-                                        //         onFileLoading: print,
-                                        //         allowMultiple: true);
-                                        // print('');
+                                        await pickFile().then((value) {
+                                          context.read<ReceiptsBloc>().add(
+                                                SaveMultiImageEvent(
+                                                  path: value,
+                                                ),
+                                              );
+                                        });
                                       },
                                       child: Ink(
                                         height: 43,
@@ -204,7 +206,8 @@ class _ReceiptsScreenState extends State<ReceiptsScreen>
                                               ),
                                             ),
                                             const Icon(
-                                                Icons.file_present_rounded)
+                                              Icons.file_present_rounded,
+                                            )
                                           ],
                                         ),
                                       ),
@@ -236,16 +239,13 @@ class _ReceiptsScreenState extends State<ReceiptsScreen>
                                   ),
                                   SnapButton(
                                     onTap: () {
-                                      final image =
-                                          _captureImage().then((value) => {
-                                                context
-                                                    .read<ReceiptsBloc>()
-                                                    .add(
-                                                      SaveImageEvent(
-                                                        path: value.path,
-                                                      ),
-                                                    )
-                                              });
+                                      _captureImage().then((value) => {
+                                            context.read<ReceiptsBloc>().add(
+                                                  SaveImageEvent(
+                                                    path: value.path,
+                                                  ),
+                                                )
+                                          });
                                     },
                                     icon: Icons.camera_alt_outlined,
                                   ),
