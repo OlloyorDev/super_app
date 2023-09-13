@@ -8,9 +8,9 @@ part 'uploadreceipts_state.dart';
 
 class UploadReceiptsBloc
     extends Bloc<UploadReceiptsEvent, UploadReceiptsState> {
-  UploadReceiptsBloc({
-    required this.databaseHelper,
-  }) : super(const UploadReceiptsState()) {
+  UploadReceiptsBloc(
+    this.databaseHelper,
+  ) : super(const UploadReceiptsState()) {
     on<InitDataBase>(_initDataBase);
     on<DeleteIndexImage>(_deleteIndexImage);
   }

@@ -7,9 +7,9 @@ part 'all_receipts_event.dart';
 part 'all_receipts_state.dart';
 
 class AllReceiptsBloc extends Bloc<AllReceiptsEvent, AllReceiptsState> {
-  AllReceiptsBloc({
-    required this.databaseHelper,
-  }) : super(const AllReceiptsState()) {
+  AllReceiptsBloc(
+    this.databaseHelper,
+  ) : super(const AllReceiptsState()) {
     on<GetDataBase>(_getDataBase);
     on<DeleteIndexImage>(_deleteIndexImage);
     on<ClearDbEvent>(_clearDbEvent);

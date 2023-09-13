@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:super_app/core/theme/app_colors.dart';
 import 'package:super_app/route/route_name.dart';
 
@@ -20,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> toHome() async {
-    Timer(const Duration(milliseconds: 500), () {
+    Timer(const Duration(seconds: 1), () {
       Navigator.pushReplacementNamed(context, Routes.home);
     });
   }
@@ -34,13 +35,11 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
         child: Scaffold(
           backgroundColor: ThemeColors.light.background,
-          body: const Stack(
+          body: Stack(
             children: [
               Positioned.fill(
                 child: Center(
-                  child: Text(
-                    'Super App',
-                  ),
+                  child: SvgPicture.asset('assets/svg/logo.svg'),
                 ),
               ),
             ],

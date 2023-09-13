@@ -15,6 +15,7 @@ import 'package:super_app/src/receipts/presentation/screens/receipts_screen.dart
 import 'package:super_app/src/splash/splash_screen.dart';
 import 'package:super_app/src/upload_receipts/presentation/bloc/uploadreceipts_bloc.dart';
 import 'package:super_app/src/upload_receipts/presentation/screens/upload_receipts_screen.dart';
+
 part 'name_routes.dart';
 
 sealed class AppRoutes {
@@ -32,7 +33,7 @@ sealed class AppRoutes {
       case Routes.home:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => HomeBloc(databaseHelper: sl()),
+            create: (_) => sl<HomeBloc>(),
             child: const HomeScreen(),
           ),
         );
@@ -55,7 +56,7 @@ sealed class AppRoutes {
       case Routes.allReceipt:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => AllReceiptsBloc(databaseHelper: sl()),
+            create: (_) => sl<AllReceiptsBloc>(),
             child: const AllReceiptsScreen(),
           ),
         );
@@ -63,7 +64,7 @@ sealed class AppRoutes {
         final UploadReceiptArgs args = settings.arguments! as UploadReceiptArgs;
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => UploadReceiptsBloc(databaseHelper: sl()),
+            create: (_) => sl<UploadReceiptsBloc>(),
             child: UploadReceiptsScreen(args: args),
           ),
         );

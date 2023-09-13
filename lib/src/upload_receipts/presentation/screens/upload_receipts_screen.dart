@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:super_app/core/extention/count_extention.dart';
 import 'package:super_app/core/theme/app_colors.dart';
 import 'package:super_app/core/theme/app_text_styles.dart';
 import 'package:super_app/core/utils/app_utils.dart';
@@ -150,7 +149,7 @@ class _UploadReceiptsScreenState extends State<UploadReceiptsScreen> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(
+                      Navigator.popAndPushNamed(
                         context,
                         Routes.receipt,
                         arguments: ReceiptsScreenArgs(
