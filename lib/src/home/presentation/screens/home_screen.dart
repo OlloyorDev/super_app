@@ -1,10 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:super_app/core/utils/app_utils.dart';
 import 'package:super_app/route/route_name.dart';
 import 'package:super_app/src/home/presentation/bloc/home_bloc.dart';
@@ -53,7 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   AppUtils.kGap12,
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, Routes.receipt);
+                      Navigator.pushNamed(
+                        context,
+                        Routes.camera,
+                      );
                     },
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,

@@ -11,6 +11,7 @@ class AllReceiptsBloc extends Bloc<AllReceiptsEvent, AllReceiptsState> {
     required this.databaseHelper,
   }) : super(const AllReceiptsState()) {
     on<GetDataBase>(_getDataBase);
+    on<DeleteIndexImage>(_deleteIndexImage);
   }
 
   final DatabaseHelper databaseHelper;
@@ -20,9 +21,25 @@ class AllReceiptsBloc extends Bloc<AllReceiptsEvent, AllReceiptsState> {
     GetDataBase event,
     Emitter<AllReceiptsState> emit,
   ) async {
-    final List<Map<String, dynamic>> imageList = await databaseHelper.getImages();
+    final List<Map<String, dynamic>> imageList =
+        await databaseHelper.getImages();
     emit(state.copyWith(
       imageList: imageList,
     ));
+  }
+
+  Future<void> _deleteIndexImage(
+    DeleteIndexImage event,
+    Emitter<AllReceiptsState> emit,
+  ) async {
+    var imageList = state.imageList;
+    final int id = imageList?[event.index]['id'];
+    await databaseHelper.deleteImage(id);
+    imageList = await databaseHelper.getImages();
+    emit(
+      state.copyWith(
+        imageList: imageList,
+      ),
+    );
   }
 }

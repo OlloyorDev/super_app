@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_app/core/extention/count_extention.dart';
 import 'package:super_app/core/theme/app_colors.dart';
 import 'package:super_app/core/theme/app_text_styles.dart';
 import 'package:super_app/core/utils/app_utils.dart';
 import 'package:super_app/route/route_name.dart';
+import 'package:super_app/src/camera/presentation/screens/camera_screen.dart';
 import 'package:super_app/src/receipts/presentation/screens/receipts_screen.dart';
 import 'package:super_app/src/upload_receipts/presentation/bloc/uploadreceipts_bloc.dart';
 
@@ -20,13 +22,6 @@ class UploadReceiptsScreen extends StatefulWidget {
 }
 
 class _UploadReceiptsScreenState extends State<UploadReceiptsScreen> {
-  @override
-  void initState() {
-    // context.read<UploadReceiptsBloc>().add(InitDataBase());
-    debugPrint(widget.args.imageList.length.toString());
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<UploadReceiptsBloc, UploadReceiptsState>(
@@ -66,25 +61,21 @@ class _UploadReceiptsScreenState extends State<UploadReceiptsScreen> {
                                           child: Ink(
                                             height: 50,
                                             width: 50,
-                                            child: Image.asset(widget
-                                                .args.imageList[index ~/ 2]),
+                                            child: Image.asset(
+                                              widget.args.imageList[index ~/ 2],
+                                            ),
                                           ),
                                         ),
                                         title: Text(
-                                          widget.args.imageList[index ~/ 2].split('/').last,
+                                          widget.args.imageList[index ~/ 2]
+                                              .split('/')
+                                              .last,
                                           maxLines: 1,
                                         ),
-                                        trailing: IconButton(
-                                          icon: const Icon(Icons.delete),
-                                          onPressed: () {
-                                            context
-                                                .read<UploadReceiptsBloc>()
-                                                .add(
-                                                  DeleteIndexImage(
-                                                    index: index,
-                                                  ),
-                                                );
-                                          },
+                                        trailing: const Icon(
+                                          Icons.arrow_forward_ios,
+                                          size: 18,
+                                          color: Colors.grey,
                                         ),
                                       ),
                                     ),
@@ -94,7 +85,7 @@ class _UploadReceiptsScreenState extends State<UploadReceiptsScreen> {
                                     onTap: () {
                                       Navigator.pushNamed(
                                         context,
-                                        Routes.receipt,
+                                        Routes.camera,
                                       );
                                     },
                                     child: Container(
@@ -158,7 +149,15 @@ class _UploadReceiptsScreenState extends State<UploadReceiptsScreen> {
                 AppUtils.kGap16,
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        Routes.receipt,
+                        arguments: ReceiptsScreenArgs(
+                          path: widget.args.imageList,
+                        ),
+                      );
+                    },
                     child: const Text('Confirm'),
                   ),
                 ),
@@ -168,3 +167,11 @@ class _UploadReceiptsScreenState extends State<UploadReceiptsScreen> {
         ),
       );
 }
+
+// class CameraScreenArgs {
+//   const CameraScreenArgs({
+//     required this.isFromUploadReceipts,
+//   });
+//
+//   final bool isFromUploadReceipts;
+// }

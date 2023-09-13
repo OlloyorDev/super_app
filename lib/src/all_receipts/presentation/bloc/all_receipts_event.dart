@@ -10,3 +10,14 @@ class GetDataBase extends AllReceiptsEvent {
   @override
   List<Object?> get props => [];
 }
+
+class DeleteIndexImage extends AllReceiptsEvent {
+  const DeleteIndexImage({
+    required this.index,
+  });
+
+  final int index;
+
+  @override
+  List<Object?> get props => [index];
+}

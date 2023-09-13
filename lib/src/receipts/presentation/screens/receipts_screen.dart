@@ -1,287 +1,154 @@
-import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:camera/camera.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:super_app/constants/svg/app_svg.dart';
-import 'package:super_app/core/mixins/file_mixin.dart';
-import 'package:super_app/core/mixins/image_mixin.dart';
 import 'package:super_app/core/theme/app_colors.dart';
 import 'package:super_app/core/theme/app_text_styles.dart';
 import 'package:super_app/core/utils/app_utils.dart';
 import 'package:super_app/route/route_name.dart';
+import 'package:super_app/src/camera/presentation/bloc/camera_bloc.dart';
 import 'package:super_app/src/receipts/presentation/bloc/receipts_bloc.dart';
-import 'package:super_app/src/receipts/presentation/mixins/receipts_mixin.dart';
-import 'package:super_app/src/receipts/presentation/widgets/snap_button.dart';
 
 class ReceiptsScreen extends StatefulWidget {
-  const ReceiptsScreen({super.key});
+  const ReceiptsScreen({
+    super.key,
+    required this.args,
+  });
+
+  final ReceiptsScreenArgs args;
 
   @override
   State<ReceiptsScreen> createState() => _ReceiptsScreenState();
 }
 
-class _ReceiptsScreenState extends State<ReceiptsScreen>
-    with ReceiptsMixin, ImageMixin, FileMixin {
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    initCameras();
-  }
-
-  void initCameras() {
-    context
-        .read<ReceiptsBloc>()
-        .add(const OpenCameraEvent(cameraStatus: CameraStatus.loading));
-    availableCameras().then((cameras) {
-      if (cameras.isNotEmpty) {
-        _controller =
-            CameraController(cameras.first, ResolutionPreset.ultraHigh);
-        _initializeControllerFuture = _controller.initialize().then((_) {
-          setState(() {});
-        });
-      }
-    });
-    context
-        .read<ReceiptsBloc>()
-        .add(const OpenCameraEvent(cameraStatus: CameraStatus.on));
-  }
-
-  Future<XFile> _captureImage() async {
-    try {
-      await _initializeControllerFuture;
-      final image = await _controller.takePicture();
-      debugPrint('Image captured: ${image.path}');
-      return image;
-    } on CameraException catch (e) {
-      debugPrint('Error capturing image: $e');
-      return XFile('');
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
+class _ReceiptsScreenState extends State<ReceiptsScreen> {
   @override
   Widget build(BuildContext context) =>
       BlocConsumer<ReceiptsBloc, ReceiptsState>(
         listener: (context, state) {
-          state.saveImageStatus.isSaved || state.saveMultiImageStatus.isSaved
-              ? Navigator.pushNamed(
-                  context,
-                  Routes.uploadReceipt,
-                  arguments: UploadReceiptArgs(imageList: state.images ?? []),
-                )
-              : debugPrint(state.cameraStatus.toString());
-          debugPrint('Olloyor');
-          debugPrint(state.images?.length.toString());
+          if (state.saveImageStatus == SaveImageStatus.saved) {
+            Navigator.pushNamedAndRemoveUntil(
+                context, Routes.allReceipt, (route) => false);
+          }
         },
         builder: (context, state) => Scaffold(
-          backgroundColor: ThemeColors.light.black,
-          body: GestureDetector(
-            onTap: () {
-              if (state.isCamera) {
-                context.read<ReceiptsBloc>().add(
-                      CameraEvent(
-                        isCamera: !state.isCamera,
-                      ),
-                    );
-              }
-            },
-            child: state.cameraStatus == CameraStatus.loading ||
-                    state.saveMultiImageStatus == SaveMultiImageStatus.saving
-                ? Center(
-                    child: CircularProgressIndicator.adaptive(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        ThemeColors.light.white,
-                      ),
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: const Text('Receipts'),
+          ),
+          body: CustomScrollView(
+            slivers: [
+              const SliverToBoxAdapter(child: AppUtils.kGap16),
+              SliverPadding(
+                padding: AppUtils.kPaddingHorizontal5,
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    childCount: widget.args.path.length * 2,
+                    (context, index) => index.isEven
+                        ? ListTile(
+                            leading: Image.asset(widget.args.path[index ~/ 2]),
+                            tileColor: ThemeColors.light.white,
+                            title: Text(
+                              widget.args.path[index ~/ 2].split('/').last,
+                              maxLines: 1,
+                            ),
+                          )
+                        : AppUtils.kDivider,
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: AppUtils.kGap16),
+            ],
+          ),
+          bottomNavigationBar: SafeArea(
+            minimum: AppUtils.kPaddingAll14,
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      sortAndGroupImages(imagePaths);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          ThemeColors.light.primary.withOpacity(.15),
                     ),
-                  )
-                : CameraPreview(
-                    _controller,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SafeArea(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                onPressed: () => Navigator.pop(context),
-                                icon: Icon(
-                                  Icons.close,
-                                  color: ThemeColors.light.white,
-                                ),
-                              ),
-                              Text(
-                                'Snap a receipt',
-                                textAlign: TextAlign.center,
-                                style: AppTextStyles.light.appbarTitle.copyWith(
-                                  color: ThemeColors.light.white,
-                                ),
-                              ),
-                              const SizedBox(width: 50),
-                            ],
-                          ),
-                        ),
-                        AppUtils.kSpacer,
-                        Padding(
-                          padding: AppUtils.kPaddingHorizontal48,
-                          child: Visibility(
-                            visible: state.isCamera,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            child: AnimatedOpacity(
-                              curve: Curves.fastOutSlowIn,
-                              duration: const Duration(milliseconds: 10),
-                              opacity: state.isCamera ? 1 : 0,
-                              child: Container(
-                                height: 91,
-                                width: 228,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  color: ThemeColors.light.background,
-                                ),
-                                child: Column(
-                                  children: [
-                                    InkWell(
-                                      onTap: () async {
-                                        await pickImage().then((value) {
-                                          if (value.isNotEmpty) {
-                                            context.read<ReceiptsBloc>().add(
-                                                  SaveMultiImageEvent(
-                                                    path: value,
-                                                  ),
-                                                );
-                                          }
-                                        });
-                                      },
-                                      child: Ink(
-                                        height: 43,
-                                        padding: AppUtils.kPaddingHorizontal16,
-                                        width: double.infinity,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              'Take library',
-                                              style: AppTextStyles
-                                                  .light.regularCaption1
-                                                  .copyWith(
-                                                color: ThemeColors.light.black,
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                            const Icon(Icons.photo_library)
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    AppUtils.kDivider,
-                                    InkWell(
-                                      onTap: () async {
-                                        await pickFile().then((value) {
-                                          if (value.isNotEmpty) {
-                                            context.read<ReceiptsBloc>().add(
-                                                  SaveMultiImageEvent(
-                                                    path: value,
-                                                  ),
-                                                );
-                                          }
-                                        });
-                                      },
-                                      child: Ink(
-                                        height: 43,
-                                        padding: AppUtils.kPaddingHorizontal16,
-                                        width: double.infinity,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              'Choose files',
-                                              style: AppTextStyles
-                                                  .light.regularCaption1
-                                                  .copyWith(
-                                                color: ThemeColors.light.black,
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                            const Icon(
-                                              Icons.file_present_rounded,
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SafeArea(
-                          child: Ink(
-                            width: MediaQuery.of(context).size.width,
-                            child: Padding(
-                              padding: AppUtils.kPaddingHorizontal48,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SnapButton(
-                                    onTap: () {
-                                      context.read<ReceiptsBloc>().add(
-                                            CameraEvent(
-                                              isCamera: !state.isCamera,
-                                            ),
-                                          );
-                                    },
-                                    svg: AppSvg.photo,
-                                  ),
-                                  SnapButton(
-                                    onTap: () {
-                                      _captureImage().then((value) => {
-                                            context.read<ReceiptsBloc>().add(
-                                                  SaveImageEvent(
-                                                    path: value.path,
-                                                  ),
-                                                )
-                                          });
-                                    },
-                                    icon: Icons.camera_alt_outlined,
-                                  ),
-                                  SnapButton(
-                                    onTap: () {},
-                                    svg: AppSvg.flash,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      'Restore',
+                      style: AppTextStyles.light.regularCaption1.copyWith(
+                        color: ThemeColors.light.primary,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
+                ),
+                // SliverToBoxAdapter(
+                //   child: Column(
+                //     children: [],
+                //   ),
+                // ),
+                AppUtils.kGap16,
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      context.read<ReceiptsBloc>().add(
+                            ReceiptSaveImageEvent(
+                              path: widget.args.path,
+                            ),
+                          );
+                    },
+                    child: const Text('Save Changes'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
 }
 
-class UploadReceiptArgs {
-  const UploadReceiptArgs({
-    required this.imageList,
+class ReceiptsScreenArgs {
+  const ReceiptsScreenArgs({
+    required this.path,
   });
 
-  final List<String> imageList;
+  final List<String> path;
+}
+
+List<String> imagePaths = [
+  'image1.png',
+  'image2.jpeg',
+  'image3.jpeg',
+  'image4.png',
+  'image5.jpeg',
+  'image6.png',
+  'image7.png',
+  'image8.svg',
+  'image8.gif',
+  'image8.jpg',
+  'image8.mpg',
+  'image8.png',
+  'image8.webm',
+];
+
+class ImageFile {
+  ImageFile({
+    required this.path,
+    required this.type,
+  });
+
+  String path;
+  String type;
+}
+
+List<String> sortAndGroupImages(List<String> images) {
+  final List<ImageFile> imageFiles = [];
+  final Set sortList = {};
+  for (final e in images) {
+    print(e.split('.').last);
+    sortList.add(e.split('.').last);
+  }
+  print('newnewnew');
+  print(sortList);
+  return images;
 }

@@ -28,6 +28,7 @@ sealed class AppUtils {
   static const kPaddingAll14 = EdgeInsets.all(14);
   static const kPaddingAll16 = EdgeInsets.all(16);
   static const kPaddingHorizontal16 = EdgeInsets.symmetric(horizontal: 16);
+  static const kPaddingHorizontal5 = EdgeInsets.symmetric(horizontal: 5);
   static const kPaddingHorizontal48 =
       EdgeInsets.symmetric(horizontal: 48, vertical: 12);
 
