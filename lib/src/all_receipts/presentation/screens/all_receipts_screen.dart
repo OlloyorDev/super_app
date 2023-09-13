@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:super_app/core/extention/count_extention.dart';
 import 'package:super_app/core/theme/app_colors.dart';
 import 'package:super_app/core/utils/app_utils.dart';
 import 'package:super_app/route/route_name.dart';
 import 'package:super_app/src/all_receipts/presentation/bloc/all_receipts_bloc.dart';
-
-import '../../../upload_receipts/presentation/screens/upload_receipts_screen.dart';
 
 class AllReceiptsScreen extends StatefulWidget {
   const AllReceiptsScreen({super.key});
@@ -28,6 +25,19 @@ class _AllReceiptsScreenState extends State<AllReceiptsScreen> {
         builder: (context, state) => Scaffold(
           appBar: AppBar(
             title: const Text('All Receipt'),
+            actions: [
+              Visibility(
+                visible: state.imageList?.isNotEmpty ?? true ,
+                child: IconButton(
+                  onPressed: () {
+                    context.read<AllReceiptsBloc>().add(const ClearDbEvent());
+                  },
+                  icon: const Icon(
+                    Icons.delete_outline_outlined,
+                  )
+                ),
+              )
+            ],
           ),
           body: CustomScrollView(
             slivers: [

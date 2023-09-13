@@ -27,8 +27,8 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
       BlocConsumer<ReceiptsBloc, ReceiptsState>(
         listener: (context, state) {
           if (state.saveImageStatus == SaveImageStatus.saved) {
-            Navigator.pushNamedAndRemoveUntil(
-                context, Routes.allReceipt, (route) => false);
+            Navigator.popAndPushNamed(context, Routes.allReceipt,
+                arguments: widget.args);
           }
         },
         builder: (context, state) => Scaffold(

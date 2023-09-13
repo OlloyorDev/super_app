@@ -21,3 +21,10 @@ class DeleteIndexImage extends AllReceiptsEvent {
   @override
   List<Object?> get props => [index];
 }
+
+class ClearDbEvent extends AllReceiptsEvent {
+  const ClearDbEvent();
+
+  @override
+  List<Object?> get props => [];
+}

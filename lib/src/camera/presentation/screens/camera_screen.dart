@@ -31,6 +31,7 @@ class _CameraScreenState extends State<CameraScreen>
     super.initState();
     initCameras();
   }
+
   Future<void> initCameras() async {
     context
         .read<CameraBloc>()
@@ -71,11 +72,8 @@ class _CameraScreenState extends State<CameraScreen>
   Widget build(BuildContext context) => BlocConsumer<CameraBloc, CameraState>(
         listener: (context, state) {
           state.saveImageStatus.isSaved || state.saveMultiImageStatus.isSaved
-              ? Navigator.pushNamed(
-                  context,
-                  Routes.uploadReceipt,
-                  arguments: UploadReceiptArgs(imageList: state.images ?? []),
-                )
+              ? Navigator.popAndPushNamed(context, Routes.uploadReceipt,
+                  arguments: UploadReceiptArgs(imageList: state.images ?? []))
               : debugPrint(state.cameraStatus.toString());
           debugPrint('Olloyor');
           debugPrint(state.images?.length.toString());

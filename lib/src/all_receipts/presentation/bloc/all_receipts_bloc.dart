@@ -12,6 +12,7 @@ class AllReceiptsBloc extends Bloc<AllReceiptsEvent, AllReceiptsState> {
   }) : super(const AllReceiptsState()) {
     on<GetDataBase>(_getDataBase);
     on<DeleteIndexImage>(_deleteIndexImage);
+    on<ClearDbEvent>(_clearDbEvent);
   }
 
   final DatabaseHelper databaseHelper;
@@ -41,5 +42,15 @@ class AllReceiptsBloc extends Bloc<AllReceiptsEvent, AllReceiptsState> {
         imageList: imageList,
       ),
     );
+  }
+
+  Future<void> _clearDbEvent(
+    ClearDbEvent event,
+    Emitter<AllReceiptsState> emit,
+  ) async {
+    await databaseHelper.deleteAll();
+    emit(state.copyWith(
+      imageList: [],
+    ));
   }
 }
